@@ -1,0 +1,39 @@
+name: Build Java
+run-name: ${{ github.actor }} is building Java
+
+on: [push]
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Get repository code
+        uses: actions/checkout@v6
+
+      - name: Set up Java
+        uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Compile Java
+        run: |
+          mkdir -p build
+          javac -d build App.java
+
+      - name: Create JAR
+        run: jar --create --file app.jar --main-class App -C build .
+
+      - name: Run JAR
+        run: java -jar app.jar
+
+      - name: Save JAR
+        uses: actions/upload-artifact@v7
+        with:
+          name: java-demo
+          path: app.jar
+          if-no-files-found: error
